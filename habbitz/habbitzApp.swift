@@ -1,6 +1,5 @@
-
-
 import SwiftUI
+import SwiftData
 
 @main
 struct habbitzApp: App {
@@ -8,5 +7,6 @@ struct habbitzApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Habit.self)
     }
 }
