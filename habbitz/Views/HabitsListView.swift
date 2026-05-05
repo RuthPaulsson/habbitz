@@ -1,8 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct HabitsListView: View {
     let habits: [Habit]
     let onAddHabit: () -> Void
+    
+    @Environment(\.modelContext) private var modelContext
+    @State private var viewModel = HabitViewModel()
     
     private var completedToday: Int {
         habits.filter { isDoneToday($0) }.count
@@ -55,30 +59,38 @@ struct HabitsListView: View {
                     
                     VStack(spacing: 8) {
                         ForEach(habits) { habit in
-                            HabitRowView(habit: habit)
+                            HabitRowView(
+                                habit: habit,
+                                onToggle: {
+                                    viewModel.toggleDone(
+                                        habit: habit,
+                                        context: modelContext
+                                    )
+                                }
+                            )
                         }
                     }
-                    .padding(.horizontal, 20)
-                    Spacer(minLength: 90)
+                        .padding(.horizontal, 20)
+                        Spacer(minLength: 90)
+                    }
                 }
+                
+                Button(action: onAddHabit) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 22, weight: .semibold))
+                        .foregroundStyle(Color("background"))
+                        .frame(width: 56, height: 56)
+                        .background(Color.accent)
+                        .clipShape(Circle())
+                }
+                .padding(.trailing, 22)
+                .padding(.bottom, 24)
             }
-            
-            Button(action: onAddHabit) {
-                Image(systemName: "plus")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(Color("background"))
-                    .frame(width: 56, height: 56)
-                    .background(Color.accent)
-                    .clipShape(Circle())
-            }
-            .padding(.trailing, 22)
-            .padding(.bottom, 24)
+        }
+        
+        private func isDoneToday(_ habit: Habit) -> Bool {
+            habit.completedDates.contains(where: {
+                Calendar.current.isDateInToday($0)
+            })
         }
     }
-    
-    private func isDoneToday(_ habit: Habit) -> Bool {
-        habit.completedDates.contains(where: {
-            Calendar.current.isDateInToday($0)
-        })
-    }
-}

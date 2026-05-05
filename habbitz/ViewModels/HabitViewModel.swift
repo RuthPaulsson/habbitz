@@ -25,5 +25,24 @@ class HabitViewModel {
             showError = true
         }
     }
+    
+    func toggleDone(habit: Habit, context: ModelContext) {
+            let calendar = Calendar.current
+     
+            if let index = habit.completedDates.firstIndex(where: {
+                calendar.isDateInToday($0)
+            }) {
+                habit.completedDates.remove(at: index)
+            } else {
+                habit.completedDates.append(Date())
+            }
+     
+            do {
+                try context.save()
+            } catch {
+                errorMessage = "Kunde inte spara ändringen: \(error.localizedDescription)"
+                showError = true
+            }
+        }
 }
 
