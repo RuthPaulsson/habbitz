@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HabitRowView: View {
     let habit: Habit
+    let onToggle: () -> Void
     
     private var isDoneToday: Bool {
         habit.completedDates.contains(where: {
@@ -51,9 +52,12 @@ struct HabitRowView: View {
             
             Spacer()
             
+            Button(action: onToggle) {
             Image(systemName: isDoneToday ? "checkmark.circle.fill" : "circle")
                 .font(.system(size: 26))
                 .foregroundStyle(isDoneToday ? Color.darkText : Color.active)
+        }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
