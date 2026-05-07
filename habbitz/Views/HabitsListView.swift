@@ -22,7 +22,6 @@ struct HabitsListView: View {
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             List {
-                // Header
                 VStack(alignment: .leading, spacing: 4) {
                     Text(todayLabel)
                         .font(.caption)
@@ -38,7 +37,6 @@ struct HabitsListView: View {
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
  
-                // Progress-kort
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Text("Dagens framsteg")
@@ -65,10 +63,10 @@ struct HabitsListView: View {
                 .listRowSeparator(.hidden)
                 .listRowInsets(EdgeInsets())
  
-                // Vanorna med swipe-to-delete
                 ForEach(habits) { habit in
                     HabitRowView(
                         habit: habit,
+                        streak: viewModel.currentStreak(for: habit),
                         onToggle: {
                             viewModel.toggleDone(habit: habit, context: modelContext)
                         }
@@ -87,7 +85,6 @@ struct HabitsListView: View {
                     }
                 }
  
-                // Luft längst ner så FAB:en inte täcker sista raden
                 Color.clear
                     .frame(height: 80)
                     .listRowBackground(Color.clear)
@@ -97,7 +94,6 @@ struct HabitsListView: View {
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
  
-            // Flytande plus-knapp
             Button(action: onAddHabit) {
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .semibold))

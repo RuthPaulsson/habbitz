@@ -45,6 +45,26 @@ class HabitViewModel {
             }
         }
     
+    func currentStreak(for habit: Habit) -> Int {
+           let calendar = Calendar.current
+           var streak = 0
+           var checkDate = Date()
+    
+           while habit.completedDates.contains(where: {
+               calendar.isDate($0, inSameDayAs: checkDate)
+           }) {
+               streak += 1
+               guard let previous = calendar.date(
+                   byAdding: .day,
+                   value: -1,
+                   to: checkDate
+               ) else { break }
+               checkDate = previous
+           }
+    
+           return streak
+       }
+    
     func deleteHabit(_ habit: Habit, context: ModelContext) {
            context.delete(habit)
     
