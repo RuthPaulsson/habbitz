@@ -44,5 +44,16 @@ class HabitViewModel {
                 showError = true
             }
         }
+    
+    func deleteHabit(_ habit: Habit, context: ModelContext) {
+           context.delete(habit)
+    
+           do {
+               try context.save()
+           } catch {
+               errorMessage = "Kunde inte radera vanan: \(error.localizedDescription)"
+               showError = true
+           }
+       }
 }
 
