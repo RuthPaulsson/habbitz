@@ -8,6 +8,9 @@ struct HabitsListView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = HabitViewModel()
  
+    @State private var habitToDelete: Habit?
+    @State private var showDeleteConfirmation = false
+ 
     private var completedToday: Int {
         habits.filter { isDoneToday($0) }.count
     }
@@ -76,9 +79,10 @@ struct HabitsListView: View {
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
                     .listRowInsets(EdgeInsets())
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                         Button(role: .destructive) {
-                            viewModel.deleteHabit(habit, context: modelContext)
+                            habitToDelete = habit
+                            showDeleteConfirmation = true
                         } label: {
                             Label("Radera", systemImage: "trash")
                         }
@@ -111,6 +115,21 @@ struct HabitsListView: View {
         } message: {
             Text(viewModel.errorMessage ?? "Något gick fel.")
         }
+        .alert(
+            "Radera \"\(habitToDelete?.name ?? "")\"?",
+            isPresented: $showDeleteConfirmation,
+            presenting: habitToDelete
+        ) { habit in
+            Button("Avbryt", role: .cancel) {
+                habitToDelete = nil
+            }
+            Button("Radera", role: .destructive) {
+                viewModel.deleteHabit(habit, context: modelContext)
+                habitToDelete = nil
+            }
+        } message: { habit in
+            Text(deleteMessage(for: habit))
+        }
     }
  
     private func isDoneToday(_ habit: Habit) -> Bool {
@@ -118,4 +137,15 @@ struct HabitsListView: View {
             Calendar.current.isDateInToday($0)
         })
     }
+ 
+    private func deleteMessage(for habit: Habit) -> String {
+        let streak = viewModel.currentStreak(for: habit)
+        if streak > 0 {
+            let dagar = streak == 1 ? "dag" : "dagar"
+            return "Din streak på \(streak) \(dagar) försvinner och kan inte återställas."
+        } else {
+            return "Detta går inte att ångra."
+        }
+    }
 }
+ 
