@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HabitRowView: View {
     let habit: Habit
+    let streak: Int
     let onToggle: () -> Void
     
     private var isDoneToday: Bool {
@@ -9,23 +10,13 @@ struct HabitRowView: View {
             Calendar.current.isDateInToday($0)
         })
     }
-    
-    private var currentStreak: Int {
-        var streak = 0
-        var checkDate = Date()
-        let calendar = Calendar.current
-        while habit.completedDates.contains(where: {
-            calendar.isDate($0, inSameDayAs: checkDate)
-        }) {
-            streak += 1
-            guard let previous = calendar.date(byAdding: .day, value: -1, to: checkDate) else { break }
-            checkDate = previous
-        }
-        return streak
+    private var streakLabel: String {
+        "\(streak) \(streak == 1 ? "dag" : "dagar")"
     }
     
     var body: some View {
         HStack(spacing: 12) {
+            
             Text(String(habit.name.prefix(1).uppercased()))
                 .font(.headline)
                 .foregroundStyle(Color.darkText)
@@ -38,14 +29,15 @@ struct HabitRowView: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Color.darkText)
                 
-                if currentStreak > 0 {
+                if streak > 0 {
                     HStack(spacing: 4) {
                         Image(systemName: "flame.fill")
                             .font(.caption2)
                             .foregroundStyle(.orange)
-                        Text("\(currentStreak) dagar")
+                        Text(streakLabel)
                             .font(.caption)
                             .foregroundStyle(Color.darkText)
+                        
                     }
                 }
             }
@@ -53,10 +45,10 @@ struct HabitRowView: View {
             Spacer()
             
             Button(action: onToggle) {
-            Image(systemName: isDoneToday ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 26))
-                .foregroundStyle(isDoneToday ? Color.darkText : Color.active)
-        }
+                Image(systemName: isDoneToday ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 26))
+                    .foregroundStyle(isDoneToday ? Color.darkText : Color.active)
+            }
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 12)
